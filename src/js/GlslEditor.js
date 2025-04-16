@@ -158,13 +158,15 @@ export default class GlslEditor {
         this.shader.el.style.float = this.options.canvas_float;
 
       this.editor.on("cursorActivity", (cm) => {
-        let height =
-          cm.heightAtLine(cm.getCursor().line + 1, "local") -
-          this.shader.el.clientHeight;
-        if (height < 0) {
-          height = 0.0;
+        if (this.shader) {
+          let height =
+            cm.heightAtLine(cm.getCursor().line + 1, "local") -
+            this.shader.el.clientHeight;
+          if (height < 0) {
+            height = 0.0;
+          }
+          this.shader.el.style.top = height.toString() + "px";
         }
-        this.shader.el.style.top = height.toString() + "px";
       });
     }
 
@@ -231,7 +233,7 @@ export default class GlslEditor {
           content[key] = this.bufferManager.buffers[key].getValue();
         }
       } else {
-        content[new Date().getTime().toString()] = this.editor.getValue();
+        content[new Date().getTime().toString()] = this.editor?.getValue();
       }
 
       if (this.options.menu) {
@@ -245,7 +247,7 @@ export default class GlslEditor {
     if (this.options.menu) {
       // If there is previus content load it.
       let oldContent = JSON.parse(
-        LocalStorage.getItem(STORAGE_LAST_EDITOR_CONTENT)
+        LocalStorage.getItem(STORAGE_LAST_EDITOR_CONTENT) ?? "{}"
       );
       if (oldContent) {
         for (var key in oldContent) {

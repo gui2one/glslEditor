@@ -74,6 +74,7 @@ export default class GlslEditor {
     this.change = false;
     this.autoupdate = true;
     this.lygia_glob = null;
+    this.local_storage_glob = null;
 
     if (options) this.options = options;
 
@@ -200,6 +201,51 @@ export default class GlslEditor {
         }
 
         if (result.length > 0) {
+          CodeMirror.showHint(
+            cm,
+            () => {
+              let rta = {
+                list: result,
+                from: CodeMirror.Pos(lineN, start),
+                to: CodeMirror.Pos(lineN, end),
+              };
+
+              console.log(rta);
+              return rta;
+            },
+            { completeSingle: true, alignWithWord: true }
+          );
+        }
+      } else if (line.startsWith("#include")) {
+        let path = line.substring(8);
+        if (this.local_storage_glob === null) {
+          getJSON("local_shaders.json", (err, data) => {
+            if (err === null) {
+              this.local_storage_glob = data;
+              console.log(data);
+            } else {
+              console.log(err);
+            }
+          });
+        }
+        console.log("autocomplete for", path);
+
+        let start = token.start;
+        let end = cur.ch;
+        let lineN = cur.line;
+
+        let result = [];
+
+        if (this.local_storage_glob !== null) {
+          this.local_storage_glob.forEach((w) => {
+            if (w.startsWith(path)) result.push('#include "' + w + '"');
+          });
+          result.sort();
+        }
+
+        if (result.length > 0) {
+          console.log(result);
+
           CodeMirror.showHint(
             cm,
             () => {

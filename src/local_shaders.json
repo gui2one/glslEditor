@@ -1,0 +1,4 @@
+[
+    "/local_shaders/gradients/linear-gradient.glsl",
+    "/local_shaders/gradients/radial-gradient.glsl"
+]
